@@ -1,6 +1,6 @@
 /*
  * libjingle
- * Copyright 2011, Google Inc.
+ * Copyright 2012, Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,29 +25,26 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TALK_EXAMPLES_PEERCONNECTION_SERVER_UTILS_H_
-#define TALK_EXAMPLES_PEERCONNECTION_SERVER_UTILS_H_
+#ifndef TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_
+#define TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_
 #pragma once
 
-#ifndef assert
-#ifndef WIN32
-#include <assert.h>
-#else
-#ifndef NDEBUG
-#define assert(expr)  ((void)((expr) ? true : __debugbreak()))
-#else
-#define assert(expr)  ((void)0)
-#endif  // NDEBUG
-#endif  // WIN32
-#endif  // assert
+#include "webrtc/base/flags.h"
 
-#include <string>
+extern const uint16 kDefaultServerPort;  // From defaults.[h|cc]
 
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(x) (sizeof(x) / sizeof(x[0]))
-#endif
+// Define flags for the peerconnect_client testing tool, in a separate
+// header file so that they can be shared across the different main.cc's
+// for each platform.
 
-std::string int2str(int i);
-std::string size_t2str(size_t i);
+DEFINE_bool(help, false, "Prints this message");
+DEFINE_bool(autoconnect, false, "Connect to the server without user "
+                                "intervention.");
+DEFINE_string(server, "localhost", "The server to connect to.");
+DEFINE_int(port, kDefaultServerPort,
+           "The port on which the server is listening.");
+DEFINE_bool(autocall, false, "Call the first available other client on "
+  "the server without user intervention.  Note: this flag should only be set "
+  "to true on one of the two clients.");
 
-#endif  // TALK_EXAMPLES_PEERCONNECTION_SERVER_UTILS_H_
+#endif  // TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_

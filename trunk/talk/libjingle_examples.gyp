@@ -216,6 +216,112 @@
             }],  # OS=="linux"
           ],  # conditions
         },  # target peerconnection_client
+        {
+          'target_name': 'p2p_client',
+          'type': 'executable',
+          'sources': [
+            'examples/p2p/client/socket.cc',
+            'examples/p2p/client/socket.h',
+            'examples/p2p/client/connection.cc',
+            'examples/p2p/client/connection.h',
+            'examples/p2p/client/xmlstanzaparser.cc',
+            'examples/p2p/client/xmlstanzaparser.h',
+            'examples/p2p/client/applicationmanager.h',
+            'examples/p2p/client/applicationmanager.cc',            
+            'examples/p2p/client/application.h',
+            'examples/p2p/client/login.cc',
+            'examples/p2p/client/login.h',
+          ],
+          'dependencies': [
+            '<(DEPTH)/third_party/jsoncpp/jsoncpp.gyp:jsoncpp',
+            'libjingle.gyp:libjingle_peerconnection',
+            '<@(libjingle_tests_additional_deps)',
+          ],
+          'conditions': [
+            # TODO(ronghuawu): Move these files to a win/ directory then they
+            # can be excluded automatically.
+            ['OS=="linux"', {
+              'sources': [
+                'examples/p2p/client/main.cc',
+              ],
+              'cflags': [
+                '<!@(pkg-config --cflags glib-2.0 gobject-2.0 gtk+-2.0)',
+              ],
+              'link_settings': {
+                'ldflags': [
+                  '<!@(pkg-config --libs-only-L --libs-only-other glib-2.0'
+                      ' gobject-2.0 gthread-2.0 gtk+-2.0)',
+                ],
+                'libraries': [
+                  '<!@(pkg-config --libs-only-l glib-2.0 gobject-2.0'
+                      ' gthread-2.0 gtk+-2.0)',
+                  '-lX11',
+                  '-lXcomposite',
+                  '-lXext',
+                  '-lXrender',
+                ],
+              },
+            }],  # OS=="linux"
+          ],  # conditions
+        },  # target p2p_client
+        {
+          'target_name': 'pc_client',
+          'type': 'executable',
+          'sources': [
+            'examples/pc/client/conductor.cc',
+            'examples/pc/client/conductor.h',
+            'examples/pc/client/defaults.cc',
+            'examples/pc/client/defaults.h',
+            'examples/pc/client/peer_connection_client.cc',
+            'examples/pc/client/peer_connection_client.h',
+          ],
+          'dependencies': [
+            '<(DEPTH)/third_party/jsoncpp/jsoncpp.gyp:jsoncpp',
+            'libjingle.gyp:libjingle_peerconnection',
+            '<@(libjingle_tests_additional_deps)',
+          ],
+          'conditions': [
+            # TODO(ronghuawu): Move these files to a win/ directory then they
+            # can be excluded automatically.
+            ['OS=="win"', {
+              'sources': [
+                'examples/pc/client/flagdefs.h',
+                'examples/pc/client/main.cc',
+                'examples/pc/client/main_wnd.cc',
+                'examples/pc/client/main_wnd.h',
+              ],
+              'msvs_settings': {
+                'VCLinkerTool': {
+                 'SubSystem': '2',  # Windows
+                },
+              },
+            }],  # OS=="win"
+            ['OS=="linux"', {
+              'sources': [
+                'examples/pc/client/linux/main.cc',
+                'examples/pc/client/linux/main_wnd.cc',
+                'examples/pc/client/linux/main_wnd.h',
+              ],
+              'cflags': [
+                '<!@(pkg-config --cflags glib-2.0 gobject-2.0 gtk+-2.0)',
+              ],
+              'link_settings': {
+                'ldflags': [
+                  '<!@(pkg-config --libs-only-L --libs-only-other glib-2.0'
+                      ' gobject-2.0 gthread-2.0 gtk+-2.0)',
+                ],
+                'libraries': [
+                  '<!@(pkg-config --libs-only-l glib-2.0 gobject-2.0'
+                      ' gthread-2.0 gtk+-2.0)',
+                  '-lX11',
+                  '-lXcomposite',
+                  '-lXext',
+                  '-lXrender',
+                ],
+              },
+            }],  # OS=="linux"
+          ],  # conditions
+        },  # target pc_client        
       ], # targets
     }],  # OS=="linux" or OS=="win"
 

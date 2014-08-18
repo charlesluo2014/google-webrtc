@@ -1,6 +1,6 @@
 /*
  * libjingle
- * Copyright 2011, Google Inc.
+ * Copyright 2012, Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,23 +25,52 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "talk/examples/peerconnection/server/utils.h"
+#include "talk/examples/peerconnection/client/defaults.h"
 
-#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-std::string int2str(int i) {
-  char buffer[11] = {0};
-  sprintf(buffer, "%d", i);  // NOLINT
-  return buffer;
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <unistd.h>
+#endif
+
+#include "webrtc/base/common.h"
+
+const char kAudioLabel[] = "audio_label";
+const char kVideoLabel[] = "video_label";
+const char kStreamLabel[] = "stream_label";
+const uint16 kDefaultServerPort = 8888;
+
+std::string GetEnvVarOrDefault(const char* env_var_name,
+                               const char* default_value) {
+  std::string value;
+  const char* env_var = getenv(env_var_name);
+  if (env_var)
+    value = env_var;
+
+  if (value.empty())
+    value = default_value;
+
+  return value;
 }
 
-std::string size_t2str(size_t i) {
-  char buffer[32] = {0};
-#ifdef WIN32
-  // %zu isn't supported on Windows.
-  sprintf(buffer, "%Iu", i);  // NOLINT
-#else
-  sprintf(buffer, "%zu", i);  // NOLINT
-#endif
-  return buffer;
+std::string GetPeerConnectionString() {
+  // return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+  return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:wittee.org:8887");
+}
+
+std::string GetDefaultServerName() {
+  return GetEnvVarOrDefault("WEBRTC_SERVER", "localhost");
+}
+
+std::string GetPeerName() {
+  char computer_name[256];
+  if (gethostname(computer_name, ARRAY_SIZE(computer_name)) != 0)
+    strcpy(computer_name, "host");
+  std::string ret(GetEnvVarOrDefault("USERNAME", "user"));
+  ret += '@';
+  ret += computer_name;
+  return ret;
 }

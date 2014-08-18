@@ -1,6 +1,6 @@
 /*
  * libjingle
- * Copyright 2012, Google Inc.
+ * Copyright 2011, Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,52 +25,23 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "talk/examples/peerconnection/client/defaults.h"
+#ifndef PEERCONNECTION_SAMPLES_CLIENT_DEFAULTS_H_
+#define PEERCONNECTION_SAMPLES_CLIENT_DEFAULTS_H_
+#pragma once
 
-#include <stdlib.h>
-#include <string.h>
+#include <string>
 
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <unistd.h>
-#endif
+#include "webrtc/base/basictypes.h"
 
-#include "webrtc/base/common.h"
-
-const char kAudioLabel[] = "audio_label";
-const char kVideoLabel[] = "video_label";
-const char kStreamLabel[] = "stream_label";
-const uint16 kDefaultServerPort = 8888;
+extern const char kAudioLabel[];
+extern const char kVideoLabel[];
+extern const char kStreamLabel[];
+extern const uint16 kDefaultServerPort;
 
 std::string GetEnvVarOrDefault(const char* env_var_name,
-                               const char* default_value) {
-  std::string value;
-  const char* env_var = getenv(env_var_name);
-  if (env_var)
-    value = env_var;
+                               const char* default_value);
+std::string GetPeerConnectionString();
+std::string GetDefaultServerName();
+std::string GetPeerName();
 
-  if (value.empty())
-    value = default_value;
-
-  return value;
-}
-
-std::string GetPeerConnectionString() {
-  // return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
-  return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:wittee.org:8887");
-}
-
-std::string GetDefaultServerName() {
-  return GetEnvVarOrDefault("WEBRTC_SERVER", "localhost");
-}
-
-std::string GetPeerName() {
-  char computer_name[256];
-  if (gethostname(computer_name, ARRAY_SIZE(computer_name)) != 0)
-    strcpy(computer_name, "host");
-  std::string ret(GetEnvVarOrDefault("USERNAME", "user"));
-  ret += '@';
-  ret += computer_name;
-  return ret;
-}
+#endif  // PEERCONNECTION_SAMPLES_CLIENT_DEFAULTS_H_

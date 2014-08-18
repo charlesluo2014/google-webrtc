@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>PeerConnection server test page</title>
+    <script src="adapter.js"></script>
+    <script src="main.js"></script>
+    <script src="signaling.js"></script>    
+  </head>
+  <body>
+    <div style="width:35%">
+      Server:<input type="text" id="server" value="http://wittee.org:8888" /><br>
+      Your name: <input type="text" id="local" value="my_name"/>
+      <button id="connect" onclick="connect();">Connect</button>
+      <button disabled="true" id="disconnect"
+              onclick="disconnect();">Disconnect</button>
+      <br>
+      <table>
+        <tr>
+          <td>
+            Target peer id: <input type="text" id="peer_id" size="3"/></td><td>
+          </td>
+          <td>
+            <button disabled="true" id="call" onclick="call();">call</button>
+          </td>
+        </tr>
+      </table>
+      
+      <button onclick="document.getElementById('debug').innerHTML='';">
+        Clear log</button>
+      <pre id="debug">
+      </pre>
+      <br>
+      <hr>
+    </div>
+
+
+    <div style="width:65%">
+      <video id="remoteVideo" autoplay></video>
+      <video id="localVideo" autoplay></video>
+    </div>
+  </body>
+</html>
