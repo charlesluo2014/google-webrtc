@@ -2,8 +2,6 @@
 
 var sendChannel;
 var sendButton = document.getElementById("sendButton");
-var sendTextarea = document.getElementById("dataChannelSend");
-var receiveTextarea = document.getElementById("dataChannelReceive");
 
 var isChannelReady;
 var isInitiator;
@@ -23,7 +21,6 @@ var pc_config = webrtcDetectedBrowser === 'firefox' ?
 var pc_constraints = {
     'optional': [
         {'DtlsSrtpKeyAgreement': true},
-        {'RtpDataChannels': true}
     ]};
 
 // Set up audio and video regardless of what devices are present.
@@ -31,23 +28,13 @@ var sdpConstraints = {'mandatory': {
     'OfferToReceiveAudio':true,
     'OfferToReceiveVideo':true }};
 
-// sendButton.onclick = sendData;
 function initialize() {
     remoteVideo = document.getElementById('remoteVideo');
     if (remoteVideo == undefined){
         console.log('get video element failed');
     }
-    console.log('Getting user media with constraints', constraints);
-}
-function handleUserMedia(stream) {
-    localStream = stream;
-    attachMediaStream(localVideo, stream);
-    console.log('Adding local stream.');
     maybeStart();
-}
-
-function handleUserMediaError(error){
-    console.log('getUserMedia error: ', error);
+    // console.log('Getting user media with constraints', constraints);
 }
 
 /////////////////////////////////////////////
@@ -65,8 +52,10 @@ function recvMessage(peer_id, message) {
     if (message.type === 'init') {
         initialize();
     } if (message.type == 'ready') {
-        if (isCaller)
+        if (isCaller) {
+            maybeStart();
             doCall();
+        }
     }else if (message.type == 'offer'){
         pc.setRemoteDescription(new RTCSessionDescription(message));
         doAnswer();
@@ -115,88 +104,7 @@ function createPeerConnection() {
     }
     pc.onaddstream = handleRemoteStreamAdded;
     pc.onremovestream = handleRemoteStreamRemoved;
-
-    // if (isInitiator) {
-    //     try {
-    //         // Reliable Data Channels not yet supported in Chrome
-    //         sendChannel = pc.createDataChannel("sendDataChannel",
-    //                                            {reliable: false});
-    //         sendChannel.onmessage = handleMessage;
-    //         trace('Created send data channel');
-    //     } catch (e) {
-    //         alert('Failed to create data channel. ' +
-    //               'You need Chrome M25 or later with RtpDataChannel enabled');
-    //         trace('createDataChannel() failed with exception: ' + e.message);
-    //     }
-    //     sendChannel.onopen = handleSendChannelStateChange;
-    //     sendChannel.onclose = handleSendChannelStateChange;
-    // } else {
-    //     pc.ondatachannel = gotReceiveChannel;
-    // }
 }
-
-function sendData() {
-    var data = sendTextarea.value;
-    sendChannel.send(data);
-    trace('Sent data: ' + data);
-}
-
-// function closeDataChannels() {
-//   trace('Closing data channels');
-//   sendChannel.close();
-//   trace('Closed data channel with label: ' + sendChannel.label);
-//   receiveChannel.close();
-//   trace('Closed data channel with label: ' + receiveChannel.label);
-//   localPeerConnection.close();
-//   remotePeerConnection.close();
-//   localPeerConnection = null;
-//   remotePeerConnection = null;
-//   trace('Closed peer connections');
-//   startButton.disabled = false;
-//   sendButton.disabled = true;
-//   closeButton.disabled = true;
-//   dataChannelSend.value = "";
-//   dataChannelReceive.value = "";
-//   dataChannelSend.disabled = true;
-//   dataChannelSend.placeholder = "Press Start, enter some text, then press Send.";
-// }
-
-// function gotReceiveChannel(event) {
-//     trace('Receive Channel Callback');
-//     sendChannel = event.channel;
-//     sendChannel.onmessage = handleMessage;
-//     sendChannel.onopen = handleReceiveChannelStateChange;
-//     sendChannel.onclose = handleReceiveChannelStateChange;
-// }
-
-// function handleMessage(event) {
-//     trace('Received message: ' + event.data);
-//     receiveTextarea.value = event.data;
-// }
-
-// function handleSendChannelStateChange() {
-//     var readyState = sendChannel.readyState;
-//     trace('Send channel state is: ' + readyState);
-//     enableMessageInterface(readyState == "open");
-// }
-
-// function handleReceiveChannelStateChange() {
-//     var readyState = sendChannel.readyState;
-//     trace('Receive channel state is: ' + readyState);
-//     enableMessageInterface(readyState == "open");
-// }
-
-// function enableMessageInterface(shouldEnable) {
-//     if (shouldEnable) {
-//         dataChannelSend.disabled = false;
-//         dataChannelSend.focus();
-//         dataChannelSend.placeholder = "";
-//         sendButton.disabled = false;
-//     } else {
-//         dataChannelSend.disabled = true;
-//         sendButton.disabled = true;
-//     }
-// }
 
 function handleIceCandidate(event) {
     console.log('handleIceCandidate event: ', event);
@@ -215,19 +123,9 @@ function errorNull(e) {
 }
 function doCall() {
     console.log('call doCall()');
-    var constraints = {'optional': [], 'mandatory': {'MozDontOfferDataChannel': true}};
-    // temporary measure to remove Moz* constraints in Chrome
-    if (webrtcDetectedBrowser === 'chrome') {
-        for (var prop in constraints.mandatory) {
-            if (prop.indexOf('Moz') !== -1) {
-                delete constraints.mandatory[prop];
-            }
-        }
-    }
-    constraints = mergeConstraints(constraints, sdpConstraints);
     console.log('Sending offer to peer, with constraints: \n' +
-                '  \'' + JSON.stringify(constraints) + '\'.');
-    pc.createOffer(setLocalAndSendMessage, errorNull, constraints);
+                '  \'' + JSON.stringify(sdpConstraints) + '\'.');
+    pc.createOffer(setLocalAndSendMessage, errorNull, sdpConstraints);
 }
 
 function doAnswer() {

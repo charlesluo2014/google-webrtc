@@ -25,24 +25,16 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "talk/examples/peerconnection/client/conductor.h"
-#include "talk/examples/peerconnection/client/flagdefs.h"
-#include "talk/examples/peerconnection/client/main_wnd.h"
-#include "talk/examples/peerconnection/client/peer_connection_client.h"
+#include <gtk/gtk.h>
+
+#include "talk/examples/pc-single/client/conductor.h"
+#include "talk/examples/pc-single/client/flagdefs.h"
+#include "talk/examples/pc-single/client/peer_connection_client.h"
+
 #include "webrtc/base/ssladapter.h"
-#include "webrtc/base/win32socketinit.h"
-#include "webrtc/base/win32socketserver.h"
+#include "webrtc/base/thread.h"
 
-
-int PASCAL wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
-                    wchar_t* cmd_line, int cmd_show) {
-  rtc::EnsureWinsockInit();
-  rtc::Win32Thread w32_thread;
-  rtc::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
-
-  rtc::WindowsCommandLineArguments win_args;
-  int argc = win_args.argc();
-  char **argv = win_args.argv();
+int main(int argc, char* argv[]) {
 
   rtc::FlagList::SetFlagsFromCommandLine(&argc, argv, true);
   if (FLAG_help) {
@@ -56,38 +48,18 @@ int PASCAL wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
     printf("Error: %i is not a valid port.\n", FLAG_port);
     return -1;
   }
-
-  MainWnd wnd(FLAG_server, FLAG_port, FLAG_autoconnect, FLAG_autocall);
-  if (!wnd.Create()) {
-    ASSERT(false);
-    return -1;
-  }
+  rtc::Thread* thread = rtc::Thread::Current();
 
   rtc::InitializeSSL();
+  // Must be constructed after we set the socketserver.
   PeerConnectionClient client;
   rtc::scoped_refptr<Conductor> conductor(
-        new rtc::RefCountedObject<Conductor>(&client, &wnd));
+      new rtc::RefCountedObject<Conductor>(&client));
 
-  // Main loop.
-  MSG msg;
-  BOOL gm;
-  while ((gm = ::GetMessage(&msg, NULL, 0, 0)) != 0 && gm != -1) {
-    if (!wnd.PreTranslateMessage(&msg)) {
-      ::TranslateMessage(&msg);
-      ::DispatchMessage(&msg);
-    }
-  }
-
-  if (conductor->connection_active() || client.is_connected()) {
-    while ((conductor->connection_active() || client.is_connected()) &&
-           (gm = ::GetMessage(&msg, NULL, 0, 0)) != 0 && gm != -1) {
-      if (!wnd.PreTranslateMessage(&msg)) {
-        ::TranslateMessage(&msg);
-        ::DispatchMessage(&msg);
-      }
-    }
-  }
+  conductor->StartLogin(FLAG_server, FLAG_port);
+  thread->Run();
 
   rtc::CleanupSSL();
   return 0;
 }
+

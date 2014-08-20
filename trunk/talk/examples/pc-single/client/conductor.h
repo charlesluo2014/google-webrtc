@@ -25,8 +25,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PEERCONNECTION_SAMPLES_CLIENT_CONDUCTOR_H_
-#define PEERCONNECTION_SAMPLES_CLIENT_CONDUCTOR_H_
+#ifndef PC_SINGLE_SAMPLES_CLIENT_CONDUCTOR_H_
+#define PC_SINGLE_SAMPLES_CLIENT_CONDUCTOR_H_
 #pragma once
 
 #include <deque>
@@ -34,9 +34,9 @@
 #include <set>
 #include <string>
 
-#include "talk/examples/peerconnection/client/main_wnd.h"
-#include "talk/examples/peerconnection/client/peer_connection_client.h"
+#include "talk/examples/pc-single/client/peer_connection_client.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
+#include "talk/app/webrtc/test/fakeconstraints.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "webrtc/base/scoped_ptr.h"
 
@@ -51,8 +51,7 @@ class VideoRenderer;
 class Conductor
   : public webrtc::PeerConnectionObserver,
     public webrtc::CreateSessionDescriptionObserver,
-    public PeerConnectionClientObserver,
-    public MainWndCallback {
+    public PeerConnectionClientObserver{
  public:
   enum CallbackID {
     MEDIA_CHANNELS_INITIALIZED = 1,
@@ -62,11 +61,11 @@ class Conductor
     NEW_STREAM_ADDED,
     STREAM_REMOVED,
   };
-
-  Conductor(PeerConnectionClient* client, MainWindow* main_wnd);
+  Conductor();
+  Conductor(PeerConnectionClient* client);
 
   bool connection_active() const;
-
+  void PrintPeerList();
   virtual void Close();
 
  protected:
@@ -110,7 +109,7 @@ class Conductor
   //
   // MainWndCallback implementation.
   //
-
+public:
   virtual void StartLogin(const std::string& server, int port);
 
   virtual void DisconnectFromServer();
@@ -121,6 +120,7 @@ class Conductor
 
   virtual void UIThreadCallback(int msg_id, void* data);
 
+protected:
   // CreateSessionDescriptionObserver implementation.
   virtual void OnSuccess(webrtc::SessionDescriptionInterface* desc);
   virtual void OnFailure(const std::string& error);
@@ -130,15 +130,15 @@ class Conductor
   void SendMessage(const std::string& json_object);
 
   int peer_id_;
+  webrtc::FakeConstraints constraints_;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> peer_connection_;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       peer_connection_factory_;
   PeerConnectionClient* client_;
-  MainWindow* main_wnd_;
   std::deque<std::string*> pending_messages_;
   std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> >
       active_streams_;
   std::string server_;
 };
 
-#endif  // PEERCONNECTION_SAMPLES_CLIENT_CONDUCTOR_H_
+#endif  // PC_SINGLE_SAMPLES_CLIENT_CONDUCTOR_H_

@@ -25,8 +25,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_
-#define TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_
+#ifndef TALK_EXAMPLES_PC_SINGLE_CLIENT_FLAGDEFS_H_
+#define TALK_EXAMPLES_PC_SINGLE_CLIENT_FLAGDEFS_H_
 #pragma once
 
 #include "webrtc/base/flags.h"
@@ -47,4 +47,4 @@ DEFINE_bool(autocall, false, "Call the first available other client on "
   "the server without user intervention.  Note: this flag should only be set "
   "to true on one of the two clients.");
 
-#endif  // TALK_EXAMPLES_PEERCONNECTION_CLIENT_FLAGDEFS_H_
+#endif  // TALK_EXAMPLES_PC_SINGLE_CLIENT_FLAGDEFS_H_
