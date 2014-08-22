@@ -14,9 +14,8 @@ var localVideo;
 var remoteVideo;
 var isCaller = false;
 var curPeerId = 0;
-var pc_config = webrtcDetectedBrowser === 'firefox' ?
-    {'iceServers':[{'url':'stun:23.21.150.121'}]} : // number IP
-    {'iceServers': [{'url': 'stun:wittee.org:8889'}]};
+//var pc_config = {'iceServers': [{'url': 'stun:10.144.8.17:8889'}]};
+var pc_config = {'iceServers': [{'url': 'stun:stunserver.org'}]};
 
 var pc_constraints = {
     'optional': [
